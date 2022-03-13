@@ -1,23 +1,18 @@
 var express = require("express");
 var router = express.Router();
 const userControll = require("../controller/userController");
+const { verifyAccessToken } = require("../config/jwt_helper");
 
-/* GET users listing. */
-// router.get("/", function (req, res, next) {
-//   res.json({ message: "jfajldfjla" });
-// });
-
-router.get("/", (req, res) => {
-  res.json({ message: "get ?" });
+router.get("/", verifyAccessToken, (req, res) => {
+  console.log(req.headers["authorization"]);
+  res.json({ message: "home page" });
 });
 
-router.get("/home", (req, res) => {
-  res.json({ message: "get" });
-});
+router.post("/reFreshToken", userControll.ReFreshToken);
 
-router.post("/home", (req, res) => {
-  res.json({ message: "post" });
-});
+router.post("/sample-register", userControll.sampleuserRegister);
+
+router.post("/user_register", userControll.registerUser);
 
 router.post("/login", userControll.userLogin);
 

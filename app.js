@@ -1,6 +1,7 @@
 var express = require("express");
 const createError = require("http-errors");
 var path = require("path");
+const cors = require("cors");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 require("dotenv").config();
@@ -10,6 +11,13 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 
 var app = express();
+
+app.use(
+  cors({
+    origin: ["http://localhost:3000"],
+    credentials: true,
+  })
+);
 
 app.use(logger("dev"));
 app.use(express.json());
