@@ -8,7 +8,7 @@ module.exports = {
       const payload = {};
       const secret = process.env.ACCESS_TOKEN_SECRET;
       const options = {
-        expiresIn: "15s",
+        expiresIn: "1y",
         issuer: "vehHope.sanoopsasidharan.tech",
         audience: userId,
       };
@@ -22,22 +22,22 @@ module.exports = {
       });
     });
   },
-  verifyAccessToken: (req, res, next) => {
-    if (!req.headers["authorization"]) return next(createError.Unauthorized());
-    const authHeader = req.headers["authorization"];
-    const bearerToken = authHeader.split(" ");
-    const token = bearerToken[1];
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
-      if (err) {
-        const message =
-          err.name === "JsonWebTokenError" ? "Unauthorized" : err.message;
-        return next(createError.Unauthorized(message));
-      } else {
-        req.payload = payload;
-        next();
-      }
-    });
-  },
+  // verifyAccessToken: (req, res, next) => {
+  //   if (!req.headers["authorization"]) return next(createError.Unauthorized());
+  //   const authHeader = req.headers["authorization"];
+  //   const bearerToken = authHeader.split(" ");
+  //   const token = bearerToken[1];
+  //   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+  //     if (err) {
+  //       const message =
+  //         err.name === "JsonWebTokenError" ? "Unauthorized" : err.message;
+  //       return next(createError.Unauthorized(message));
+  //     } else {
+  //       req.payload = payload;
+  //       next();
+  //     }
+  //   });
+  // },
   signRefreshToken: (userId) => {
     return new Promise((resolve, rejcet) => {
       const payload = {};
@@ -68,6 +68,22 @@ module.exports = {
           resolve(userId);
         }
       );
+    });
+  },
+  verifyAccessToken: (req, res, next) => {
+    console.log(req.cookies);
+    if (!req.cookies.userTocken) return res.json({ user: false });
+    const userToken = req.cookies.userTocken;
+    jwt.verify(userToken, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+      if (err) {
+        return res.json({ user: false });
+        console.log("if");
+      } else {
+        console.log("else");
+        req.payload = payload;
+        console.log(payload);
+        next();
+      }
     });
   },
 };

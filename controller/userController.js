@@ -29,22 +29,15 @@ module.exports = {
   },
   userLogin: async (req, res, next) => {
     try {
-      console.log(req.body);
       const result = await loginSchema.validateAsync(req.body);
-      console.log("00000000000");
       const user = await User.findOne({ email: result.email });
       console.log(user);
       if (!user) throw createError.NotFound("user not registered");
-      console.log("............");
       const isMatch = await user.isValidPassword(result.password);
       if (!isMatch)
         throw createError.Unauthorized("username/password not valid");
-      console.log("............////////");
-
       const accessToken = await signAccessToken(user._id + "");
-      // const refreshToken = await signRefreshToken(user._id + "");
 
-      // res.send({ accessToken, refreshToken });
       res.cookie("userTocken", accessToken, { httpOnly: true }).send();
     } catch (error) {
       if (error.isJoi)
@@ -80,5 +73,11 @@ module.exports = {
       if (error.isJoi) return next(createError.BadRequest("data is not valid"));
       next(error);
     }
+  },
+  // userHome
+  userHome: async (req, res) => {
+    console.log(req.body);
+    console.log("userhaoime");
+    res.json({ message: " you " });
   },
 };
