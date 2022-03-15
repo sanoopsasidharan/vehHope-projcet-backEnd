@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+const jwt = require("jsonwebtoken");
 const userControll = require("../controller/userController");
 const { verifyAccessToken } = require("../config/jwt_helper");
 const { userAuth } = require("../middleware/userAuth");
@@ -20,9 +21,16 @@ router.post("/login", userControll.userLogin);
 router.get("/", userAuth, userControll.userHome);
 
 router.post("/isLoggedin", verifyAccessToken, (req, res, next) => {
-  console.log(req.cookies.userTocken);
-  console.log("is loggedin");
-  res.json({ user: true });
+  const userToken = req.cookies.userTocken;
+  jwt.verify(userToken, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+    if (err) {
+      return res.json({ user: false });
+    } else {
+      const userId = payload.aud;
+      console.log(userId);
+      res.cookie("userId", userId, { httpOnly: true }).json({ user: true });
+    }
+  });
 });
 
 module.exports = router;

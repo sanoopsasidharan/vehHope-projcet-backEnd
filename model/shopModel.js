@@ -12,8 +12,32 @@ const shopSchema = new schema({
     type: String,
     required: true,
   },
+  shopName: {
+    type: String,
+  },
+  shopType: {
+    type: String,
+  },
+  number: {
+    type: String,
+    required: true,
+  },
+  location: {
+    type: String,
+  },
+  state: {
+    type: String,
+  },
+  userId: {
+    type: String,
+  },
+  image: {
+    type: String,
+  },
+  active: {
+    type: Boolean,
+  },
 });
-
 shopSchema.pre("save", async function (next) {
   try {
     const salt = await bcrypt.genSalt(10);

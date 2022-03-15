@@ -17,8 +17,19 @@ const shopLoginSchema = joi.object({
   password: joi.string().min(4).required(),
 });
 
+const shopCreateingSchema = joi.object({
+  shopName: joi.string().lowercase().min(3).required(),
+  shopType: joi.string().lowercase().min(3).required(),
+  email: joi.string().email().lowercase().required(),
+  number: joi.string().length(10).required(),
+  location: joi.string().required(),
+  state: joi.string().required(),
+  // imgae: joi.string(),
+});
+
 module.exports = {
   loginSchema,
   userCreateSchema,
   shopLoginSchema,
+  shopCreateingSchema,
 };

@@ -1,6 +1,12 @@
 const createError = require("http-errors");
-const { shopLoginSchema } = require("../config/valiadation_schema");
-const shops = require("../model/shopModel");
+const {
+  shopLoginSchema,
+  shopCreateingSchema,
+} = require("../config/valiadation_schema");
+const Shops = require("../model/shopModel");
+const { cloudinary } = require("../utils/cloudinary");
+var ObjectId = require("mongodb").ObjectId;
+
 module.exports = {
   shopHome: async (req, res) => {
     console.log("shop home page mvc");
@@ -10,7 +16,7 @@ module.exports = {
     try {
       const result = await shopLoginSchema.validateAsync(req.body);
       console.log(result);
-      const user = await shops.findOne({ email: result.email });
+      const user = await Shops.findOne({ email: result.email });
       console.log(user, "user");
     } catch (error) {
       next(error);
@@ -34,4 +40,46 @@ module.exports = {
   //     next(error);
   //   }
   // },
+
+  // createing shop
+  CreateShop: async (req, res, next) => {
+    console.log(req.body);
+    try {
+      console.log(req.body.image);
+      const file = req.body.image;
+      const uploadResponse = await cloudinary.uploader.upload(file, {
+        upload_preset: "vehHope",
+      });
+      console.log(uploadResponse);
+      console.log(uploadResponse.secure_url);
+
+      // const result = await shopCreateingSchema.validateAsync(req.body);
+
+      const shopDetails = {
+        shopName: req.body.shopName,
+        shopType: req.body.shopType,
+        email: req.body.email,
+        number: req.body.number,
+        location: req.body.location,
+        state: req.body.state,
+        password: req.body.password,
+        userId: req.cookies.userId,
+        active: false,
+        image: uploadResponse.secure_url,
+      };
+      console.log(req.cookies.userId);
+      const doesExist = await Shops.findOne({ email: req.body.email });
+      console.log(doesExist, "doesExist");
+      if (doesExist)
+        return res
+          .status(404)
+          .json({ msg: `${result.email} is already registered` });
+      const shop = new Shops(shopDetails);
+      const saveShop = await shop.save();
+      res.json(saveShop);
+    } catch (error) {
+      if (error.isJoi) console.log(error);
+      next(error);
+    }
+  },
 };

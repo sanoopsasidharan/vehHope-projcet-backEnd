@@ -71,17 +71,14 @@ module.exports = {
     });
   },
   verifyAccessToken: (req, res, next) => {
-    console.log(req.cookies);
     if (!req.cookies.userTocken) return res.json({ user: false });
     const userToken = req.cookies.userTocken;
     jwt.verify(userToken, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
       if (err) {
         return res.json({ user: false });
-        console.log("if");
       } else {
-        console.log("else");
         req.payload = payload;
-        console.log(payload);
+        const userId = payload.aud;
         next();
       }
     });

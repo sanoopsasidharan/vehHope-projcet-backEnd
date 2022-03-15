@@ -36,6 +36,8 @@ module.exports = {
       const isMatch = await user.isValidPassword(result.password);
       if (!isMatch)
         throw createError.Unauthorized("username/password not valid");
+
+      const userId = user._id + "";
       const accessToken = await signAccessToken(user._id + "");
 
       res.cookie("userTocken", accessToken, { httpOnly: true }).send();
