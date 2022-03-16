@@ -18,11 +18,14 @@ router.post("/user_register", userControll.registerUser);
 
 router.post("/login", userControll.userLogin);
 
+// user home page
+// @no body
+// @noretrun
 router.get("/", userControll.userHome);
 
 // user profile
 // @body userId
-// retrun user data
+// @retrun user data
 router.post("/userProfile", userControll.gettingUserDetails);
 
 // @ update user details

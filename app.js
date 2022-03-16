@@ -8,7 +8,7 @@ const session = require("express-session");
 require("dotenv").config();
 require("./config/connection");
 
-var indexRouter = require("./routes/index");
+var adminRouter = require("./routes/admin");
 var usersRouter = require("./routes/users");
 const shopRouter = require("./routes/shop");
 
@@ -34,9 +34,10 @@ app.use(
   })
 );
 
-app.use("/hi", indexRouter);
 app.use("/", usersRouter);
+app.use("/admin", adminRouter);
 app.use("/shop", shopRouter);
+// app.use("/admin", adminRouter);
 
 // error handler
 app.use((req, res, next) => next(createError.NotFound()));

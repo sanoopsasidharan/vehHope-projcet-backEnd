@@ -4,10 +4,8 @@ const createError = require("http-errors");
 
 module.exports = {
   signAccessToken: (user) => {
-    console.log(user, "funning");
     const id = user._id + "";
     const userNme = user.name;
-    console.log(id, userNme);
     return new Promise((resolve, rejcet) => {
       const payload = {
         userNme,
@@ -21,7 +19,6 @@ module.exports = {
       };
       jwt.sign(payload, secret, options, (err, token) => {
         if (err) {
-          console.log(err.message);
           rejcet(createError.InternalServerError());
         } else {
           resolve(token);
@@ -89,6 +86,44 @@ module.exports = {
         res.json({ user: true, payload });
         // .cookie("userId", userId, { httpOnly: true })
 
+        next();
+      }
+    });
+  },
+  // admin access Token
+  adminAccessToken: (admin) => {
+    const id = admin._id + "";
+    const adminNme = admin.name;
+    return new Promise((resolve, rejcet) => {
+      const payload = {
+        adminNme,
+        id,
+      };
+      const secret = process.env.ACCESS_TOKEN_SECRET;
+      const options = {
+        expiresIn: "1y",
+        issuer: "vehHope.sanoopsasidharan.tech",
+        audience: id,
+      };
+      jwt.sign(payload, secret, options, (err, token) => {
+        if (err) {
+          rejcet(createError.InternalServerError());
+        } else {
+          resolve(token);
+        }
+      });
+    });
+  },
+  // verify admin tokenW
+  verifyAdminToken: async (req, res, next) => {
+    if (!req.cookies.adminToken) return res.json({ admin: "fuck" });
+    const { adminToken } = req.cookies;
+    jwt.verify(adminToken, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+      if (err) {
+        return res.json({ admin: false });
+      } else {
+        req.payload = payload;
+        res.json({ admin: true, payload });
         next();
       }
     });

@@ -34,10 +34,16 @@ const user_DetailsUpdate = joi.object({
   name: joi.string().lowercase().required(),
 });
 
+const adminLogin = joi.object({
+  email: joi.string().email().required(),
+  password: joi.string().required(),
+});
+
 module.exports = {
   loginSchema,
   userCreateSchema,
   shopLoginSchema,
   shopCreateingSchema,
   user_DetailsUpdate,
+  adminLogin,
 };

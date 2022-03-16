@@ -4,8 +4,9 @@ const {
   shopCreateingSchema,
 } = require("../config/valiadation_schema");
 const Shops = require("../model/shopModel");
+const Booking = require("../model/Shop_BookingModel");
 const { cloudinary } = require("../utils/cloudinary");
-var ObjectId = require("mongodb").ObjectId;
+var objectId = require("mongodb").ObjectId;
 
 module.exports = {
   shopHome: async (req, res) => {
@@ -79,6 +80,53 @@ module.exports = {
       res.json(saveShop);
     } catch (error) {
       if (error.isJoi) console.log(error);
+      next(error);
+    }
+  },
+  // view shop profile
+  view_ShopProfile: async (req, res, next) => {
+    console.log(req.body);
+    try {
+      const shopProfile = await Shops.findById(req.body.shopId);
+      console.log(shopProfile);
+      res.json(shopProfile);
+    } catch (error) {
+      next(error);
+    }
+  },
+  // view shop booking history
+  view_shopBookingHistory: async (req, res, next) => {
+    console.log(req.body);
+    try {
+      const { shopId } = req.body;
+      const history = await Booking.aggregate([
+        { $match: { shopId: objectId(shopId) } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        {
+          $unwind: "$user",
+        },
+        {
+          $lookup: {
+            from: "shops",
+            localField: "shopId",
+            foreignField: "_id",
+            as: "shop",
+          },
+        },
+        {
+          $unwind: "$shop",
+        },
+      ]);
+      console.log(history);
+      res.json(history);
+    } catch (error) {
       next(error);
     }
   },
