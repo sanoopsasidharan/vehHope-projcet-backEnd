@@ -3,6 +3,7 @@ const User = require("../model/userModel");
 const {
   loginSchema,
   userCreateSchema,
+  user_DetailsUpdate,
 } = require("../config/valiadation_schema");
 const {
   signAccessToken,
@@ -38,9 +39,9 @@ module.exports = {
         throw createError.Unauthorized("username/password not valid");
 
       const userId = user._id + "";
-      const accessToken = await signAccessToken(user._id + "");
+      const accessToken = await signAccessToken(user);
 
-      res.cookie("userTocken", accessToken, { httpOnly: true }).send();
+      res.cookie("userTocken", accessToken, { httpOnly: true }).json({ user });
     } catch (error) {
       if (error.isJoi)
         return next(createError.BadRequest("invalid username / password"));
@@ -81,5 +82,32 @@ module.exports = {
     console.log(req.body);
     console.log("userhaoime");
     res.json({ message: " you " });
+  },
+  // userDetails
+  gettingUserDetails: async (req, res, next) => {
+    try {
+      const user = await User.findById(req.body.userId);
+      console.log(user);
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  },
+  // update user profile
+  update_userProfile: async (req, res, next) => {
+    try {
+      console.log(req.body);
+      const { name, email, number, userId } = req.body;
+      console.log(name, email, number, userId);
+      const result = await user_DetailsUpdate.validateAsync(req.body);
+      console.log(result);
+      const userRes = await User.findByIdAndUpdate(userId, {
+        $set: { name, email, number },
+      });
+      console.log(userRes);
+      res.status(200).json({ message: "update user" });
+    } catch (error) {
+      next(error);
+    }
   },
 };

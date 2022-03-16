@@ -3,14 +3,21 @@ const createError = require("http-errors");
 // const { refreshToken } = require("../controller/userController");
 
 module.exports = {
-  signAccessToken: (userId) => {
+  signAccessToken: (user) => {
+    console.log(user, "funning");
+    const id = user._id + "";
+    const userNme = user.name;
+    console.log(id, userNme);
     return new Promise((resolve, rejcet) => {
-      const payload = {};
+      const payload = {
+        userNme,
+        id,
+      };
       const secret = process.env.ACCESS_TOKEN_SECRET;
       const options = {
         expiresIn: "1y",
         issuer: "vehHope.sanoopsasidharan.tech",
-        audience: userId,
+        audience: id,
       };
       jwt.sign(payload, secret, options, (err, token) => {
         if (err) {
@@ -79,6 +86,9 @@ module.exports = {
       } else {
         req.payload = payload;
         const userId = payload.aud;
+        res.json({ user: true, payload });
+        // .cookie("userId", userId, { httpOnly: true })
+
         next();
       }
     });

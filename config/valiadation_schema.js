@@ -27,9 +27,17 @@ const shopCreateingSchema = joi.object({
   // imgae: joi.string(),
 });
 
+const user_DetailsUpdate = joi.object({
+  userId: joi.string().required(),
+  email: joi.string().lowercase().email().required(),
+  number: joi.string().required(),
+  name: joi.string().lowercase().required(),
+});
+
 module.exports = {
   loginSchema,
   userCreateSchema,
   shopLoginSchema,
   shopCreateingSchema,
+  user_DetailsUpdate,
 };
