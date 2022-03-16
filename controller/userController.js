@@ -1,5 +1,8 @@
 const createError = require("http-errors");
 const User = require("../model/userModel");
+const Shop = require("../model/shopModel");
+const Booking = require("../model/Shop_BookingModel");
+var objectId = require("mongodb").ObjectId;
 const {
   loginSchema,
   userCreateSchema,
@@ -96,16 +99,76 @@ module.exports = {
   // update user profile
   update_userProfile: async (req, res, next) => {
     try {
-      console.log(req.body);
       const { name, email, number, userId } = req.body;
-      console.log(name, email, number, userId);
       const result = await user_DetailsUpdate.validateAsync(req.body);
-      console.log(result);
       const userRes = await User.findByIdAndUpdate(userId, {
         $set: { name, email, number },
       });
-      console.log(userRes);
       res.status(200).json({ message: "update user" });
+    } catch (error) {
+      next(error);
+    }
+  },
+  // view signle shop
+  view_Shop: async (req, res, next) => {
+    try {
+      console.log(req.body);
+      const shop = await Shop.findById(req.body.shopId);
+      console.log(result);
+      res.json(shop);
+    } catch (error) {
+      next(error);
+    }
+  },
+  // user booking service
+  booking_Service: async (req, res, next) => {
+    try {
+      console.log(req.body);
+      req.body.createTime = new Date();
+      req.body.userId = objectId(req.body.userId);
+      req.body.shopId = objectId(req.body.shopId);
+      req.body.status = "pending";
+      console.log(req.body, "req.body");
+      const user = new Booking(req.body);
+      const saveUser = await user.save();
+      res.json(saveUser);
+    } catch (error) {
+      next(error);
+    }
+  },
+  // user booking history
+  user_BookingHistory: async (req, res, next) => {
+    try {
+      console.log(req.body.userId);
+      const { userId } = req.body;
+      const history = await Booking.aggregate([
+        { $match: { userId: objectId(userId) } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        {
+          $unwind: "$user",
+        },
+        {
+          $lookup: {
+            from: "shops",
+            localField: "shopId",
+            foreignField: "_id",
+            as: "shop",
+          },
+        },
+        {
+          $unwind: "$shop",
+        },
+      ]);
+      console.log(history);
+      console.log(history[0].user);
+      res.json(history);
     } catch (error) {
       next(error);
     }

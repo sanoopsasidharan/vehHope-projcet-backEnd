@@ -30,6 +30,21 @@ router.post("/userProfile", userControll.gettingUserDetails);
 // @ retrun message
 router.post("/update_userProfile", userControll.update_userProfile);
 
+// @view single shop
+// @body shopId
+// return shop objcet
+router.post("/view_Shop", userControll.view_Shop);
+
+// user booking page
+// @body shopId
+// return saveUser object
+router.post("/service_Booking", userControll.booking_Service);
+
+// show all booking history of user
+// @body userId
+// return
+router.post("/user_Booking_History", userControll.user_BookingHistory);
+
 router.post("/isLoggedin", verifyAccessToken, (req, res, next) => {
   // const userToken = req.cookies.userTocken;
   // jwt.verify(userToken, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
