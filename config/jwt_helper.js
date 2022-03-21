@@ -75,6 +75,7 @@ module.exports = {
     });
   },
   verifyAccessToken: (req, res, next) => {
+    console.log("calling is loggedin ");
     if (!req.cookies.userTocken) return res.json({ user: false });
     const userToken = req.cookies.userTocken;
     jwt.verify(userToken, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
@@ -82,10 +83,6 @@ module.exports = {
         return res.json({ user: false });
       } else {
         req.payload = payload;
-        const userId = payload.aud;
-        res.json({ user: true, payload });
-        // .cookie("userId", userId, { httpOnly: true })
-
         next();
       }
     });
@@ -116,7 +113,7 @@ module.exports = {
   },
   // verify admin tokenW
   verifyAdminToken: async (req, res, next) => {
-    if (!req.cookies.adminToken) return res.json({ admin: "fuck" });
+    if (!req.cookies.adminToken) return res.json({ admin: false });
     const { adminToken } = req.cookies;
     jwt.verify(adminToken, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
       if (err) {
@@ -124,6 +121,42 @@ module.exports = {
       } else {
         req.payload = payload;
         res.json({ admin: true, payload });
+        next();
+      }
+    });
+  },
+  // shop access token
+  shopAccessToken: (shop) => {
+    const id = shop._id + "";
+    const shopNme = shop.shopName;
+    return new Promise((resolve, rejcet) => {
+      const payload = {
+        shopNme,
+        id,
+      };
+      const secret = process.env.ACCESS_TOKEN_SECRET;
+      const options = {
+        expiresIn: "1y",
+        issuer: "vehHope.sanoopsasidharan.tech",
+        audience: id,
+      };
+      jwt.sign(payload, secret, options, (err, token) => {
+        if (err) {
+          rejcet(createError.InternalServerError());
+        } else {
+          resolve(token);
+        }
+      });
+    });
+  },
+  verifyShopToken: async (req, res, next) => {
+    if (!req.cookies.shopTocken) return res.json({ shop: false });
+    const { shopTocken } = req.cookies;
+    jwt.verify(shopTocken, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+      if (err) {
+        return res.json({ shop: false });
+      } else {
+        req.payload = payload;
         next();
       }
     });

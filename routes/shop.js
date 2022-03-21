@@ -1,30 +1,54 @@
 const express = require("express");
+const { verifyShopToken } = require("../config/jwt_helper");
 const router = express.Router();
-const shopContoller = require("../controller/ShopContoller");
+const {
+  shopHome,
+  loginShop,
+  CreateShop,
+  view_ShopProfile,
+  view_shopBookingHistory,
+  find_topShop,
+} = require("../controller/ShopContoller");
 
-router.post("/IsloggedIn", (req, res, next) => {
+router.post("/isShopLoggedIn", verifyShopToken, (req, res, next) => {
+  const payload = req.payload;
+  res.json({ shop: true, payload });
   // console.log("this is shop loggedin");
 });
 // @ shop home page
 // @ no body
 // @ no return
-router.get("/", shopContoller.shopHome);
+router.get("/", shopHome);
 
 // @ shop login page
 // @ no body
 // @ no return
-router.post("/login", shopContoller.loginShop);
+router.post("/login", loginShop);
 
-router.post("/createShop", shopContoller.CreateShop);
+// @ create shop
+// @ body shop details
+// @ return sucess response
+router.post("/createShop", verifyShopToken, CreateShop);
 
 // @ view shop profile
 // @ body shopId
 // @ return shopProfile objcet
-router.post("/shop_profile", shopContoller.view_ShopProfile);
+router.post("/shop_profile", verifyShopToken, view_ShopProfile);
 
 // @ view shop booking history
 // @ body shopId
 // @ return history array
-router.post("/bookingHistory", shopContoller.view_shopBookingHistory);
+router.post("/bookingHistory", view_shopBookingHistory);
+// updatebookingHistory
+
+// @most top shops
+// @body
+// return
+router.post("/topShops", find_topShop);
+
+// router.post("/h", (req, res) => {
+//   console.log("fdja");
+//   res.json({ sanoop: "fuck" });
+// });
 
 module.exports = router;

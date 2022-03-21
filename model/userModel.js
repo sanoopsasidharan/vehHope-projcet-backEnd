@@ -20,6 +20,10 @@ const userSchema = new schema({
     type: String,
     required: true,
   },
+  isShop: {
+    type: Boolean,
+    required: true,
+  },
 });
 
 userSchema.pre("save", async function (next) {

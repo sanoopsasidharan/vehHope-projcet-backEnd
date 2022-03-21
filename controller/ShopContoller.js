@@ -3,8 +3,10 @@ const {
   shopLoginSchema,
   shopCreateingSchema,
 } = require("../config/valiadation_schema");
+const { shopAccessToken } = require("../config/jwt_helper");
 const Shops = require("../model/shopModel");
 const Booking = require("../model/Shop_BookingModel");
+const User = require("../model/userModel");
 const { cloudinary } = require("../utils/cloudinary");
 var objectId = require("mongodb").ObjectId;
 
@@ -15,10 +17,19 @@ module.exports = {
   },
   loginShop: async (req, res, next) => {
     try {
+      console.log("this is shop");
       const result = await shopLoginSchema.validateAsync(req.body);
-      console.log(result);
-      const user = await Shops.findOne({ email: result.email });
-      console.log(user, "user");
+      const shop = await Shops.findOne({ email: result.email });
+      console.log(shop, "user");
+      if (!shop) throw createError.NotFound("user not registered");
+      const isMatch = await shop.isValidPassword(result.password);
+      if (!isMatch)
+        throw createError.Unauthorized("username/password not valid");
+
+      const shopAcessToken = await shopAccessToken(shop);
+      res
+        .cookie("shopTocken", shopAcessToken, { httpOnly: true })
+        .json({ shop });
     } catch (error) {
       next(error);
     }
@@ -44,7 +55,7 @@ module.exports = {
 
   // createing shop
   CreateShop: async (req, res, next) => {
-    console.log(req.body);
+    console.log(req.payload);
     try {
       console.log(req.body.image);
       const file = req.body.image;
@@ -55,7 +66,7 @@ module.exports = {
       console.log(uploadResponse.secure_url);
 
       // const result = await shopCreateingSchema.validateAsync(req.body);
-
+      const Id = req.payload.aud;
       const shopDetails = {
         shopName: req.body.shopName,
         shopType: req.body.shopType,
@@ -67,6 +78,7 @@ module.exports = {
         userId: req.cookies.userId,
         active: false,
         image: uploadResponse.secure_url,
+        userId: objectId(Id),
       };
       console.log(req.cookies.userId);
       const doesExist = await Shops.findOne({ email: req.body.email });
@@ -75,8 +87,13 @@ module.exports = {
         return res
           .status(404)
           .json({ msg: `${result.email} is already registered` });
+
       const shop = new Shops(shopDetails);
       const saveShop = await shop.save();
+      const user = await User.updateOne(
+        { _id: objectId(req.payload.aud) },
+        { set: { isShop: true } }
+      );
       res.json(saveShop);
     } catch (error) {
       if (error.isJoi) console.log(error);
@@ -85,11 +102,27 @@ module.exports = {
   },
   // view shop profile
   view_ShopProfile: async (req, res, next) => {
-    console.log(req.body);
+    console.log(req.payload.aud, "payload");
     try {
-      const shopProfile = await Shops.findById(req.body.shopId);
-      console.log(shopProfile);
-      res.json(shopProfile);
+      const shopProfile = await Shops.aggregate([
+        { $match: { _id: objectId(req.payload.aud) } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        {
+          $unwind: "$user",
+        },
+      ]);
+
+      console.log(shopProfile[0]);
+
+      if (!shopProfile) throw createError.NotFound("shop not get");
+      res.json(shopProfile[0]);
     } catch (error) {
       next(error);
     }
@@ -126,6 +159,17 @@ module.exports = {
       ]);
       console.log(history);
       res.json(history);
+    } catch (error) {
+      next(error);
+    }
+  },
+  // find top rating shops
+  find_topShop: async (req, res, next) => {
+    try {
+      console.log("..//...//..//../");
+      const topshops = await Shops.find().limit(9);
+      console.log(topshops);
+      res.json(topshops);
     } catch (error) {
       next(error);
     }

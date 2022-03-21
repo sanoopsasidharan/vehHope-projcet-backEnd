@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const schema = mongoose.Schema;
 const bcrypt = require("bcrypt");
+const { object } = require("joi");
 const shopSchema = new schema({
   email: {
     type: String,
@@ -28,14 +29,15 @@ const shopSchema = new schema({
   state: {
     type: String,
   },
-  userId: {
-    type: String,
-  },
+  userId: {},
   image: {
     type: String,
   },
   active: {
     type: Boolean,
+  },
+  description: {
+    type: String,
   },
 });
 shopSchema.pre("save", async function (next) {

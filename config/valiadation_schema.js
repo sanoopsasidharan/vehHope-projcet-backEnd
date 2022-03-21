@@ -11,6 +11,7 @@ const userCreateSchema = joi.object({
   number: joi.string().min(10).max(10).required(),
   location: joi.string().required(),
   password: joi.string().min(4).required(),
+  isShop: joi.boolean().required(),
 });
 const shopLoginSchema = joi.object({
   email: joi.string().email().lowercase().required(),

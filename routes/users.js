@@ -1,65 +1,73 @@
 var express = require("express");
 var router = express.Router();
 const jwt = require("jsonwebtoken");
-const userControll = require("../controller/userController");
+const {
+  ReFreshToken,
+  user_BookingHistory,
+  sampleuserRegister,
+  registerUser,
+  userLogin,
+  userHome,
+  gettingUserDetails,
+  update_userProfile,
+  view_Shop,
+  booking_Service,
+  cancel_BookingHistory,
+  createShop,
+} = require("../controller/userController");
 const { verifyAccessToken } = require("../config/jwt_helper");
-const { userAuth } = require("../middleware/userAuth");
 
-// router.get("/", verifyAccessToken, (req, res) => {
-//   console.log(req.headers["authorization"]);
-//   res.json({ message: "home page" });
-// });
+router.post("/reFreshToken", ReFreshToken);
 
-router.post("/reFreshToken", userControll.ReFreshToken);
+router.post("/sample-register", sampleuserRegister);
 
-router.post("/sample-register", userControll.sampleuserRegister);
+router.post("/user_register", registerUser);
 
-router.post("/user_register", userControll.registerUser);
+router.post("/login", userLogin);
 
-router.post("/login", userControll.userLogin);
+// create shop
+// body
+// return
+router.post("/create_shop", verifyAccessToken, createShop);
 
 // user home page
 // @no body
 // @noretrun
-router.get("/", userControll.userHome);
+router.get("/", userHome);
 
 // user profile
 // @body userId
 // @retrun user data
-router.post("/userProfile", userControll.gettingUserDetails);
+router.post("/userProfile", gettingUserDetails);
 
 // @ update user details
 // @body userId,name,email,password,number
 // @ retrun message
-router.post("/update_userProfile", userControll.update_userProfile);
+router.post("/update_userProfile", update_userProfile);
 
 // @view single shop
 // @body shopId
 // return shop objcet
-router.post("/view_Shop", userControll.view_Shop);
+router.post("/view_Shop", view_Shop);
 
 // user booking page
 // @body shopId
 // return saveUser object
-router.post("/service_Booking", userControll.booking_Service);
+router.post("/service_Booking", booking_Service);
 
 // show all booking history of user
 // @body userId
 // return
-router.post("/user_Booking_History", userControll.user_BookingHistory);
+router.post("/user_Booking_History", verifyAccessToken, user_BookingHistory);
+
+// update user booking history
+// @body bookingId
+// return
+router.post("/CancelBooking", verifyAccessToken, cancel_BookingHistory);
 
 router.post("/isLoggedin", verifyAccessToken, (req, res, next) => {
-  // const userToken = req.cookies.userTocken;
-  // jwt.verify(userToken, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
-  //   if (err) {
-  //     return res.json({ user: false });
-  //   } else {
-  //     const userId = payload.aud;
-  //     res
-  //       .cookie("userId", userId, { httpOnly: true })
-  //       .json({ user: true, payload });
-  //   }
-  // });
+  let payload = req.payload;
+  res.json({ user: true, payload });
 });
 
 module.exports = router;
