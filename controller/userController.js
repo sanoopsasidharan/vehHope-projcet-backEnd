@@ -184,10 +184,13 @@ module.exports = {
   },
   // view signle shop
   view_Shop: async (req, res, next) => {
+    console.log("this is veiw page");
     try {
+      console.log("dfafdjkl");
       console.log(req.body);
       const shop = await Shop.findById(req.body.shopId);
-      console.log(result);
+      if (!shop) throw createError.NotFound("shop not get");
+      console.log(shop);
       res.json(shop);
     } catch (error) {
       next(error);
