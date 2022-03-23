@@ -14,6 +14,7 @@ const {
   booking_Service,
   cancel_BookingHistory,
   createShop,
+  userHistory_InStatus,
 } = require("../controller/userController");
 const { verifyAccessToken } = require("../config/jwt_helper");
 
@@ -53,7 +54,9 @@ router.post("/view_Shop", view_Shop);
 // user booking page
 // @body shopId
 // return saveUser object
-router.post("/service_Booking", booking_Service);
+router.post("/service_Booking", verifyAccessToken, booking_Service);
+
+router.post("/user_history_InStatus", verifyAccessToken, userHistory_InStatus);
 
 // show all booking history of user
 // @body userId

@@ -31,6 +31,10 @@ const bookingSchema = new schema({
     type: String,
     required: true,
   },
+  number: {
+    type: Number,
+    required: true,
+  },
   status: {
     type: String,
     required: true,

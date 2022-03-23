@@ -199,9 +199,11 @@ module.exports = {
   // user booking service
   booking_Service: async (req, res, next) => {
     try {
+      console.log(".......................");
       console.log(req.body);
+      console.log(req.payload.aud);
       req.body.createTime = new Date();
-      req.body.userId = objectId(req.body.userId);
+      req.body.userId = objectId(req.payload.aud);
       req.body.shopId = objectId(req.body.shopId);
       req.body.status = "pending";
       console.log(req.body, "req.body");
@@ -241,10 +243,52 @@ module.exports = {
         {
           $unwind: "$shop",
         },
+        {
+          $sort: { _id: -1 },
+        },
       ]);
       console.log(history);
       // console.log(history[0].user);
       // res.json(history);
+      res.json(history).status(200);
+    } catch (error) {
+      next(error);
+    }
+  },
+  // user booking history in status
+  userHistory_InStatus: async (req, res, next) => {
+    try {
+      if (!req.payload.aud) res.json({ err: "user not valid " });
+      const userId = req.payload.aud;
+      const history = await Booking.aggregate([
+        { $match: { userId: objectId(userId), status: req.body.status } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        {
+          $unwind: "$user",
+        },
+        {
+          $lookup: {
+            from: "shops",
+            localField: "shopId",
+            foreignField: "_id",
+            as: "shop",
+          },
+        },
+        {
+          $unwind: "$shop",
+        },
+        {
+          $sort: { _id: -1 },
+        },
+      ]);
+      console.log(history);
       res.json(history).status(200);
     } catch (error) {
       next(error);
