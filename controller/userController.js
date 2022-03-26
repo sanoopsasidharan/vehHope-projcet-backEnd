@@ -74,7 +74,11 @@ module.exports = {
   registerUser: async (req, res, next) => {
     try {
       req.body.isShop = false;
+      req.body.isActive = true;
+
+      console.log(req.body);
       const result = await userCreateSchema.validateAsync(req.body);
+      console.log("fist step");
       const doesExist = await User.findOne({ email: result.email });
       if (doesExist)
         return res

@@ -24,6 +24,28 @@ const userSchema = new schema({
     type: Boolean,
     required: true,
   },
+  isActive: {
+    type: Boolean,
+    required: true,
+  },
+  lantitude: {
+    type: String,
+    required: true,
+  },
+  longitude: {
+    type: String,
+    required: true,
+  },
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+    },
+    coordinates: {
+      type: [Number],
+      index: "2dsphere",
+    },
+  },
 });
 
 userSchema.pre("save", async function (next) {
@@ -36,6 +58,18 @@ userSchema.pre("save", async function (next) {
     next(error);
   }
 });
+
+userSchema.pre(
+  "save",
+  async function (next) {
+    this.location = {
+      type: "Point",
+      coordinates: [this.longitude, this.lantitude],
+    };
+    next();
+  },
+  { timestamps: true }
+);
 
 userSchema.methods.isValidPassword = async function (password) {
   try {

@@ -8,6 +8,7 @@ const {
   view_ShopProfile,
   view_shopBookingHistory,
   find_topShop,
+  ChangeBookingStatus,
 } = require("../controller/ShopContoller");
 
 router.post("/isShopLoggedIn", verifyShopToken, (req, res, next) => {
@@ -38,8 +39,12 @@ router.post("/shop_profile", verifyShopToken, view_ShopProfile);
 // @ view shop booking history
 // @ body shopId
 // @ return history array
-router.post("/bookingHistory", view_shopBookingHistory);
+router.post("/bookingHistory", verifyShopToken, view_shopBookingHistory);
+
 // updatebookingHistory
+
+// change booking status
+router.post("/ChangeBookingStatus", verifyShopToken, ChangeBookingStatus);
 
 // @most top shops
 // @body

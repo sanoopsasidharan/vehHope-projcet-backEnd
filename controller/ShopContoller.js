@@ -129,9 +129,10 @@ module.exports = {
   },
   // view shop booking history
   view_shopBookingHistory: async (req, res, next) => {
-    console.log(req.body);
+    console.log(req.payload.aud, "this is payload shop id");
     try {
-      const { shopId } = req.body;
+      const shopId = req.payload.aud;
+      console.log(shopId, "this is shop id");
       const history = await Booking.aggregate([
         { $match: { shopId: objectId(shopId) } },
         {
@@ -170,6 +171,25 @@ module.exports = {
       const topshops = await Shops.find().limit(9);
       console.log(topshops);
       res.json(topshops);
+    } catch (error) {
+      next(error);
+    }
+  },
+  // change booking status
+  ChangeBookingStatus: async (req, res, next) => {
+    try {
+      console.log(req.body.status);
+      console.log(req.body.bookingId, "booking id ");
+      const changeStatus = await Booking.updateOne(
+        { _id: objectId(req.body.bookingId) },
+        { $set: { status: req.body.status } }
+      );
+
+      console.log(changeStatus);
+      if (!changeStatus.acknowledged)
+        return next(createError.BadRequest(" somthing error "));
+      console.log(changeStatus);
+      res.json(changeStatus);
     } catch (error) {
       next(error);
     }
