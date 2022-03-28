@@ -15,6 +15,8 @@ const {
   cancel_BookingHistory,
   createShop,
   userHistory_InStatus,
+  edit_userPassword,
+  userPropic,
 } = require("../controller/userController");
 const { verifyAccessToken } = require("../config/jwt_helper");
 
@@ -44,7 +46,7 @@ router.post("/userProfile", gettingUserDetails);
 // @ update user details
 // @body userId,name,email,password,number
 // @ retrun message
-router.post("/update_userProfile", update_userProfile);
+router.post("/update_userProfile", verifyAccessToken, update_userProfile);
 
 // @view single shop
 // @body shopId
@@ -67,6 +69,16 @@ router.post("/user_Booking_History", verifyAccessToken, user_BookingHistory);
 // @body bookingId
 // return
 router.post("/CancelBooking", verifyAccessToken, cancel_BookingHistory);
+
+// edit user password
+// @body oldPassword newPassword
+// return
+router.post("/editUserPassword", verifyAccessToken, edit_userPassword);
+
+// upload user profile pic
+// @body image
+// return
+router.post("/update_userProPic", verifyAccessToken, userPropic);
 
 router.post("/isLoggedin", verifyAccessToken, (req, res, next) => {
   let payload = req.payload;

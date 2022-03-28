@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const schema = mongoose.Schema;
 const bcrypt = require("bcrypt");
-const { object } = require("joi");
+const { object, array } = require("joi");
 const shopSchema = new schema({
   email: {
     type: String,
@@ -39,6 +39,27 @@ const shopSchema = new schema({
   description: {
     type: String,
   },
+  lantitude: {
+    type: String,
+    required: true,
+  },
+  longitude: {
+    type: String,
+    required: true,
+  },
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+    },
+    coordinates: {
+      type: [Number],
+      index: "2dsphere",
+    },
+  },
+  ShopService: {
+    type: Array,
+  },
 });
 shopSchema.pre("save", async function (next) {
   try {
@@ -50,6 +71,17 @@ shopSchema.pre("save", async function (next) {
     next(error);
   }
 });
+shopSchema.pre(
+  "save",
+  async function (next) {
+    this.location = {
+      type: "Point",
+      coordinates: [this.longitude, this.lantitude],
+    };
+    next();
+  },
+  { timestamps: true }
+);
 
 shopSchema.methods.isValidPassword = async function (password) {
   try {

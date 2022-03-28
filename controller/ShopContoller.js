@@ -55,6 +55,8 @@ module.exports = {
 
   // createing shop
   CreateShop: async (req, res, next) => {
+    console.log("this is calling create shop");
+    console.log(req.body);
     console.log(req.payload);
     try {
       console.log(req.body.image);
@@ -167,8 +169,26 @@ module.exports = {
   // find top rating shops
   find_topShop: async (req, res, next) => {
     try {
-      console.log("..//...//..//../");
-      const topshops = await Shops.find().limit(9);
+      // const topshops = await Shops.find().limit(9);
+      console.log("finding top shops");
+      const topshops = await Shops.aggregate([
+        {
+          $geoNear: {
+            near: {
+              type: "Point",
+              coordinates: [+"76.25221593808669", +"9.207619217556626"],
+            },
+            distanceField: "dist.calculated",
+            maxDistance: 100000,
+            includeLocs: "dist.location",
+            spherical: true,
+          },
+        },
+        {
+          $match: { active: false },
+        },
+      ]);
+      console.log("........................");
       console.log(topshops);
       res.json(topshops);
     } catch (error) {

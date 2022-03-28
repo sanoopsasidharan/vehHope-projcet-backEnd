@@ -15,6 +15,7 @@ const userCreateSchema = joi.object({
   isActive: joi.boolean().required(),
   lantitude: joi.string().required(),
   longitude: joi.string().required(),
+  image: joi.string(),
 });
 const shopLoginSchema = joi.object({
   email: joi.string().email().lowercase().required(),
@@ -32,7 +33,6 @@ const shopCreateingSchema = joi.object({
 });
 
 const user_DetailsUpdate = joi.object({
-  userId: joi.string().required(),
   email: joi.string().lowercase().email().required(),
   number: joi.string().required(),
   name: joi.string().lowercase().required(),

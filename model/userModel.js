@@ -46,6 +46,7 @@ const userSchema = new schema({
       index: "2dsphere",
     },
   },
+  image: {},
 });
 
 userSchema.pre("save", async function (next) {

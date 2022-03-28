@@ -5,6 +5,7 @@ const Booking = require("../model/Shop_BookingModel");
 var objectId = require("mongodb").ObjectId;
 const { cloudinary } = require("../utils/cloudinary");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const {
   loginSchema,
@@ -38,6 +39,7 @@ module.exports = {
   },
   userLogin: async (req, res, next) => {
     try {
+      console.log("this is user login ");
       const result = await loginSchema.validateAsync(req.body);
       const user = await User.findOne({ email: result.email });
       console.log(user);
@@ -75,11 +77,13 @@ module.exports = {
     try {
       req.body.isShop = false;
       req.body.isActive = true;
+      req.body.image = "";
 
       console.log(req.body);
       const result = await userCreateSchema.validateAsync(req.body);
       console.log("fist step");
       const doesExist = await User.findOne({ email: result.email });
+      console.log(doesExist);
       if (doesExist)
         return res
           .status(404)
@@ -95,6 +99,7 @@ module.exports = {
   },
   // user can create shop
   createShop: async (req, res, next) => {
+    console.log(req.body);
     try {
       console.log(req.payload, "payload");
       // console.log(req.body.image);
@@ -118,6 +123,9 @@ module.exports = {
         description: req.body.description,
         image: uploadResponse.secure_url,
         userId: objectId(Id),
+        lantitude: req.body.lantitude,
+        longitude: req.body.longitude,
+        ShopService: req.body.ShopService,
       };
       console.log(req.cookies.userId);
       const doesExist = await Shops.findOne({ email: req.body.email });
@@ -150,10 +158,6 @@ module.exports = {
   // userDetails
   gettingUserDetails: async (req, res, next) => {
     try {
-      // console.log("111111111111");
-      // const userId = await IdPicker(req.cookies.userTocken);
-      // console.log("22222222222");
-      // console.log(userId, "userId");
       let userDD;
       await jwt.verify(
         req.cookies.userTocken,
@@ -176,11 +180,13 @@ module.exports = {
   // update user profile
   update_userProfile: async (req, res, next) => {
     try {
-      const { name, email, number, userId } = req.body;
+      console.log(req.payload.aud);
+      const { name, email, number } = req.body;
       const result = await user_DetailsUpdate.validateAsync(req.body);
-      const userRes = await User.findByIdAndUpdate(userId, {
+      const userRes = await User.findByIdAndUpdate(req.payload.aud, {
         $set: { name, email, number },
       });
+      console.log(userRes);
       res.status(200).json({ message: "update user" });
     } catch (error) {
       next(error);
@@ -312,6 +318,57 @@ module.exports = {
       console.log(history);
       console.log(cancel);
       res.json(history);
+    } catch (error) {
+      next(error);
+    }
+  },
+  // edit User Password
+  edit_userPassword: async (req, res, next) => {
+    try {
+      console.log(req.payload.aud);
+      const { oldPassword, newPassword } = req.body;
+      const user = await User.findOne({ _id: req.payload.aud });
+      console.log(user);
+      console.log(oldPassword);
+      const isMatch = await user.isValidPassword(oldPassword);
+      console.log(isMatch);
+      if (!isMatch)
+        throw createError.Unauthorized("username/password not valid");
+
+      console.log("did't hash password");
+      // const salt = await bcrypt.genSalt(10);
+      // const hashedPassword = await bcrypt.hash(newPassword, salt);
+      // newPassword = hashedPassword;
+      console.log(newPassword);
+      const result = await User.findByIdAndUpdate(req.payload.aud, {
+        $set: { password: newPassword },
+      });
+      console.log(result);
+      res.status(200).json({ message: "update user" });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // upload user profile pic
+  userPropic: async (req, res, next) => {
+    try {
+      console.log(req.payload.aud, "payload");
+      const file = req.body.image;
+      const uploadResponse = await cloudinary.uploader.upload(file, {
+        upload_preset: "vehHope",
+      });
+      if (!uploadResponse) res.json({ message: "sorry no upload pro pic" });
+
+      console.log("............");
+      console.log(uploadResponse.secure_url);
+      let imageURL = uploadResponse.secure_url.toString();
+      console.log(imageURL);
+      const result = await User.findByIdAndUpdate(req.payload.aud, {
+        $set: { image: imageURL },
+      });
+      console.log(result);
+      res.json({ message: "upload user pro pic" });
     } catch (error) {
       next(error);
     }
