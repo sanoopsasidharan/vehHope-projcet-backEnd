@@ -9,7 +9,9 @@ const {
   view_shopBookingHistory,
   find_topShop,
   ChangeBookingStatus,
+  update_ShopProfile,
 } = require("../controller/ShopContoller");
+const { addServiceNote } = require("../controller/serviceController");
 
 router.post("/isShopLoggedIn", verifyShopToken, (req, res, next) => {
   const payload = req.payload;
@@ -50,6 +52,16 @@ router.post("/ChangeBookingStatus", verifyShopToken, ChangeBookingStatus);
 // @body
 // return
 router.post("/topShops", find_topShop);
+
+// @update shop profile
+// @body
+// @return
+router.post("/update_ShopProfile", verifyShopToken, update_ShopProfile);
+
+// @addService Note
+// @body nextSrviceKm,workerName,serviceDescription
+// return
+router.post("/addServiceNote", verifyShopToken, addServiceNote);
 
 // router.post("/h", (req, res) => {
 //   console.log("fdja");

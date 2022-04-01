@@ -18,6 +18,7 @@ module.exports = {
   loginShop: async (req, res, next) => {
     try {
       console.log("this is shop");
+      console.log(req.body);
       const result = await shopLoginSchema.validateAsync(req.body);
       const shop = await Shops.findOne({ email: result.email });
       console.log(shop, "user");
@@ -171,15 +172,17 @@ module.exports = {
     try {
       // const topshops = await Shops.find().limit(9);
       console.log("finding top shops");
+      console.log(req.body);
+      const { longitudeState, lantitudeState, kmValue } = req.body;
       const topshops = await Shops.aggregate([
         {
           $geoNear: {
             near: {
               type: "Point",
-              coordinates: [+"76.25221593808669", +"9.207619217556626"],
+              coordinates: [+longitudeState, +lantitudeState],
             },
             distanceField: "dist.calculated",
-            maxDistance: 100000,
+            maxDistance: kmValue * 1000,
             includeLocs: "dist.location",
             spherical: true,
           },
@@ -188,7 +191,6 @@ module.exports = {
           $match: { active: false },
         },
       ]);
-      console.log("........................");
       console.log(topshops);
       res.json(topshops);
     } catch (error) {
@@ -210,6 +212,23 @@ module.exports = {
         return next(createError.BadRequest(" somthing error "));
       console.log(changeStatus);
       res.json(changeStatus);
+    } catch (error) {
+      next(error);
+    }
+  },
+  // update shop details
+  update_ShopProfile: async (req, res, next) => {
+    try {
+      console.log(req.body);
+      const { shopName, shopType, email, number, state, description } =
+        req.body;
+      console.log(req.payload.aud);
+
+      const updateShopDetails = await Shops.findByIdAndUpdate(req.payload.aud, {
+        $set: { shopName, shopType, email, number, state, description },
+      });
+      console.log(updateShopDetails);
+      res.json(updateShopDetails);
     } catch (error) {
       next(error);
     }

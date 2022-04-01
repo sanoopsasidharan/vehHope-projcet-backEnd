@@ -18,6 +18,7 @@ const {
   edit_userPassword,
   userPropic,
 } = require("../controller/userController");
+const { userHomePage } = require("../controller/userHomeController");
 const { verifyAccessToken } = require("../config/jwt_helper");
 
 router.post("/reFreshToken", ReFreshToken);
@@ -79,6 +80,11 @@ router.post("/editUserPassword", verifyAccessToken, edit_userPassword);
 // @body image
 // return
 router.post("/update_userProPic", verifyAccessToken, userPropic);
+
+// user home page show all shops
+// @nobody
+// @noreturn
+router.post("/find_allShops", userHomePage);
 
 router.post("/isLoggedin", verifyAccessToken, (req, res, next) => {
   let payload = req.payload;

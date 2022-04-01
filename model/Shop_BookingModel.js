@@ -3,6 +3,7 @@ const schema = mongoose.Schema;
 const bookingSchema = new schema({
   userId: {},
   shopId: {},
+  servieNote: {},
   email: {
     type: String,
     required: true,

@@ -75,11 +75,13 @@ module.exports = {
   // register user
   registerUser: async (req, res, next) => {
     try {
+      console.log("this is register user");
       req.body.isShop = false;
       req.body.isActive = true;
-      req.body.image = "";
+      req.body.image = "fales";
 
       console.log(req.body);
+      console.log("starting validation");
       const result = await userCreateSchema.validateAsync(req.body);
       console.log("fist step");
       const doesExist = await User.findOne({ email: result.email });
@@ -89,7 +91,6 @@ module.exports = {
           .status(404)
           .json({ msg: `${result.email} is already registered` });
       const user = new User(result);
-
       const saveUser = await user.save();
       res.json(saveUser);
     } catch (error) {
@@ -215,6 +216,7 @@ module.exports = {
       req.body.createTime = new Date();
       req.body.userId = objectId(req.payload.aud);
       req.body.shopId = objectId(req.body.shopId);
+      req.body.servieNote = "not complete";
       req.body.status = "pending";
       console.log(req.body, "req.body");
       const user = new Booking(req.body);
