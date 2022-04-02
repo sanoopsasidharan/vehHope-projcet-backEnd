@@ -160,6 +160,9 @@ module.exports = {
         {
           $unwind: "$shop",
         },
+        {
+          $sort: { _id: -1 },
+        },
       ]);
       console.log(history);
       res.json(history);
