@@ -11,6 +11,8 @@ require("./config/connection");
 var adminRouter = require("./routes/admin");
 var usersRouter = require("./routes/users");
 const shopRouter = require("./routes/shop");
+const conversationRouter = require("./routes/conversations");
+const messageRouter = require("./routes/messages");
 
 var app = express();
 
@@ -37,6 +39,8 @@ app.use(
 app.use("/", usersRouter);
 app.use("/admin", adminRouter);
 app.use("/shop", shopRouter);
+app.use("/conversation", conversationRouter);
+app.use("/message", messageRouter);
 // app.use("/admin", adminRouter);
 
 // error handler

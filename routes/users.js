@@ -20,6 +20,8 @@ const {
 } = require("../controller/userController");
 const { userHomePage } = require("../controller/userHomeController");
 const { verifyAccessToken } = require("../config/jwt_helper");
+const User = require("../model/userModel");
+const Shops = require("../model/shopModel");
 
 router.post("/reFreshToken", ReFreshToken);
 
@@ -85,6 +87,18 @@ router.post("/update_userProPic", verifyAccessToken, userPropic);
 // @nobody
 // @noreturn
 router.post("/find_allShops", userHomePage);
+
+router.get("/user", async (req, res, next) => {
+  try {
+    const userId = req.query.userId;
+    const userDoc = await User.findById(userId);
+    const shopDoc = await Shops.findById(userId);
+    if (userDoc === null) res.status(200).json(shopDoc);
+    if (shopDoc === null) res.status(200).json(userDoc);
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.post("/isLoggedin", verifyAccessToken, (req, res, next) => {
   let payload = req.payload;
