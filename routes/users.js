@@ -22,6 +22,7 @@ const { userHomePage } = require("../controller/userHomeController");
 const { verifyAccessToken } = require("../config/jwt_helper");
 const User = require("../model/userModel");
 const Shops = require("../model/shopModel");
+const { findCurrentshop } = require("../controller/conversationController");
 
 router.post("/reFreshToken", ReFreshToken);
 
@@ -87,6 +88,13 @@ router.post("/update_userProPic", verifyAccessToken, userPropic);
 // @nobody
 // @noreturn
 router.post("/find_allShops", userHomePage);
+
+// finding currnet frd
+// @qurey
+//
+
+//
+router.get("/getCurrentshop", findCurrentshop);
 
 router.get("/user", async (req, res, next) => {
   try {

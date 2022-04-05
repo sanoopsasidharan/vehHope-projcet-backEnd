@@ -12,6 +12,7 @@ const {
   update_ShopProfile,
 } = require("../controller/ShopContoller");
 const { addServiceNote } = require("../controller/serviceController");
+const { findCurrentFrd } = require("../controller/conversationController");
 
 router.post("/isShopLoggedIn", verifyShopToken, (req, res, next) => {
   const payload = req.payload;
@@ -67,5 +68,7 @@ router.post("/addServiceNote", verifyShopToken, addServiceNote);
 //   console.log("fdja");
 //   res.json({ sanoop: "fuck" });
 // });
+
+router.get("/getCurrentFrd", findCurrentFrd);
 
 module.exports = router;

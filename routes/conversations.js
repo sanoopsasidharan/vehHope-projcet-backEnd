@@ -4,8 +4,9 @@ const {
   newConversation,
   getConversation,
 } = require("../controller/conversationController");
+const { verifyAccessToken } = require("../config/jwt_helper");
 
-router.post("/", newConversation);
+router.post("/", verifyAccessToken, newConversation);
 
 router.get("/:userId", getConversation);
 
