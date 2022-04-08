@@ -13,6 +13,7 @@ module.exports = {
       console.log(result.email);
       const { email, password } = result;
       const admin = await Admin.findOne({ email, password });
+      console.log(admin);
       if (admin === null)
         throw createError.Unauthorized("username/password not valid");
 
@@ -27,7 +28,8 @@ module.exports = {
   //   admin can viwe all users
   get_AllUsers: async (req, res, next) => {
     try {
-      const users = await User.find();
+      const users = await User.find().sort({ _id: -1 });
+      console.log(users);
       res.json(users);
     } catch (error) {
       next(error);
@@ -36,13 +38,25 @@ module.exports = {
   //   block unblock user
   block_UnblockUser: async (req, res, next) => {
     try {
-      const { userId, block } = req.body;
-      const userRes = await User.updateOne(
-        { _id: objectId(userId) },
-        { $set: { block } }
-      );
+      console.log("this is update user");
+      const { Id, value } = req.body;
+      const userRes = await User.findByIdAndUpdate(Id, {
+        $set: { isActive: value },
+      });
+
       console.log(userRes);
       res.json(userRes);
+    } catch (error) {
+      next(error);
+    }
+  },
+  // getingUser
+  getingUsers: async (req, res, next) => {
+    try {
+      console.log(req.query.value, "req.query.value");
+      const result = await User.find({ isActive: req.query.value });
+      console.log(result);
+      res.json(result);
     } catch (error) {
       next(error);
     }
@@ -50,7 +64,7 @@ module.exports = {
   //  admin can viwe all shop
   get_Allshops: async (req, res, next) => {
     try {
-      const shops = await Shops.find();
+      const shops = await Shops.find().sort({ _id: -1 });
       console.log(shops);
       res.json(shops);
     } catch (error) {
@@ -61,15 +75,44 @@ module.exports = {
   update_ShopActive: async (req, res, next) => {
     try {
       console.log(req.body);
-      const { shopId, active } = req.body;
-      const shopRes = await Shops.updateOne(
-        { _id: objectId(shopId) },
-        { $set: { active } }
-      );
-
-      if (!shopRes.acknowledged) return res.json({ acknowledged: false });
+      const { Id, value } = req.body;
+      const shopRes = await Shops.findByIdAndUpdate(Id, {
+        $set: { active: value },
+      });
 
       res.json(shopRes);
-    } catch (error) {}
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // getting Shops
+  gettingShops: async (req, res, next) => {
+    try {
+      console.log(req.query.value);
+      const shops = await Shops.find({ active: req.query.value }).sort({
+        _id: -1,
+      });
+      console.log(shops);
+      res.json(shops);
+    } catch (error) {
+      next(error);
+    }
+  },
+  // find shop
+  findShop: async (req, res, next) => {
+    try {
+      console.log(req.query.name);
+      const shop = await Shops.find({
+        shopName: { $regex: req.query.name },
+      }).sort({
+        _id: -1,
+      });
+
+      console.log(shop);
+      res.json(shop);
+    } catch (error) {
+      next(error);
+    }
   },
 };

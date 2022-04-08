@@ -9,11 +9,13 @@ module.exports = {
   // new conversation
   newConversation: async (req, res, next) => {
     console.log("this is conversation router");
+    console.log(req.payload, "payload");
     try {
       const IfConversation = await Conversation.find({
-        members: { $in: [req.body.receiverId] },
+        members: { $all: [req.body.receiverId, req.payload.aud] },
       });
-      console.log(IfConversation.length > 0, "IfConversation");
+      console.log(IfConversation, "IfConversation");
+      console.log(IfConversation.length, "IfConversation");
 
       if (IfConversation.length > 0) {
         res.json(IfConversation);

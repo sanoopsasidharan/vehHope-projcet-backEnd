@@ -236,4 +236,27 @@ module.exports = {
       next(error);
     }
   },
+  // update Shop pic
+  updateShop_pic: async (req, res, next) => {
+    try {
+      console.log(req.payload.aud, "payload");
+      const file = req.body.image;
+      const uploadResponse = await cloudinary.uploader.upload(file, {
+        upload_preset: "vehHope",
+      });
+      if (!uploadResponse) res.json({ message: "sorry no upload pro pic" });
+
+      console.log("............");
+      console.log(uploadResponse.secure_url);
+      let imageURL = uploadResponse.secure_url.toString();
+      console.log(imageURL);
+      const result = await Shops.findByIdAndUpdate(req.payload.aud, {
+        $set: { image: imageURL },
+      });
+      console.log(result);
+      res.json({ message: "upload user pro pic" });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

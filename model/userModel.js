@@ -36,6 +36,10 @@ const userSchema = new schema({
     type: String,
     required: true,
   },
+  place: {
+    type: String,
+    required: true,
+  },
   location: {
     type: {
       type: String,

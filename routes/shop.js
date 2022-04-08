@@ -10,6 +10,7 @@ const {
   find_topShop,
   ChangeBookingStatus,
   update_ShopProfile,
+  updateShop_pic,
 } = require("../controller/ShopContoller");
 const { addServiceNote } = require("../controller/serviceController");
 const { findCurrentFrd } = require("../controller/conversationController");
@@ -58,6 +59,8 @@ router.post("/topShops", find_topShop);
 // @body
 // @return
 router.post("/update_ShopProfile", verifyShopToken, update_ShopProfile);
+
+router.post("/updateShop_pic", verifyShopToken, updateShop_pic);
 
 // @addService Note
 // @body nextSrviceKm,workerName,serviceDescription

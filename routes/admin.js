@@ -20,6 +20,11 @@ router.post("/login", adminController.admin_Login);
 // @return users array
 router.get("/get_allUsers", adminController.get_AllUsers);
 
+// @user list
+// @nobody
+// @return users array
+router.get("/getingUsers", adminController.getingUsers);
+
 // @block and unblock user
 // @body userId block(true/fales)
 // @return  update(true)
@@ -29,6 +34,16 @@ router.post("/block_UnblockUser", adminController.block_UnblockUser);
 // @nobody
 // @return shops array
 router.get("/get_allShops", adminController.get_Allshops);
+
+// @shop list
+// @nobody
+// @return shops array
+router.get("/gettingShops", adminController.gettingShops);
+
+// @find Shop
+// @nobody
+// @return shops array
+router.get("/getShop", adminController.findShop);
 
 // @update shop active
 // @body shopId active(true/false)
