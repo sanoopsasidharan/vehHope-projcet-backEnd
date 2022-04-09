@@ -20,6 +20,7 @@ const {
 } = require("../controller/userController");
 const { userHomePage } = require("../controller/userHomeController");
 const { verifyAccessToken } = require("../config/jwt_helper");
+const { addFeedback } = require("../controller/serviceController");
 const User = require("../model/userModel");
 const Shops = require("../model/shopModel");
 const { findCurrentshop } = require("../controller/conversationController");
@@ -88,6 +89,11 @@ router.post("/update_userProPic", verifyAccessToken, userPropic);
 // @nobody
 // @noreturn
 router.post("/find_allShops", userHomePage);
+
+// @add FeedBack
+// @body
+// retrun
+router.post("/add_feedback", verifyAccessToken, addFeedback);
 
 // finding currnet frd
 // @qurey

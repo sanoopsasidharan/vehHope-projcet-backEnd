@@ -9,7 +9,8 @@ const Booking = require("../model/Shop_BookingModel");
 const User = require("../model/userModel");
 const { cloudinary } = require("../utils/cloudinary");
 var objectId = require("mongodb").ObjectId;
-
+const bcrypt = require("bcrypt");
+const Feedback = require("../model/FeedbackModel");
 module.exports = {
   shopHome: async (req, res) => {
     console.log("shop home page mvc");
@@ -256,6 +257,61 @@ module.exports = {
       console.log(result);
       res.json({ message: "upload user pro pic" });
     } catch (error) {
+      next(error);
+    }
+  },
+  // update password
+  updatePassword: async (req, res, next) => {
+    try {
+      console.log(req.payload);
+      console.log(req.body);
+      const { newPassword, oldPassword } = req.body;
+      if (newPassword === "" && oldPassword === "")
+        throw createError.BadRequest("somthing Error");
+      const shop = await Shops.findById(req.payload.aud);
+      console.log(shop);
+
+      const ismatch = await bcrypt.compare(newPassword, shop.password);
+      console.log(ismatch);
+      if (!ismatch) throw createError.Unauthorized("old password not valid");
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      const password = hashedPassword;
+
+      const result = await Shops.findByIdAndUpdate(req.payload.aud, {
+        $set: { password: password },
+      });
+      console.log(result, "result");
+      console.log(password, "password");
+      console.log(shop);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+  // getting shop rateing
+  gettingShopRating: async (req, res, next) => {
+    try {
+      console.log(req.payload);
+      console.log(req.payload.aud);
+      const rating = await Feedback.find({ shopId: objectId(req.payload.aud) });
+      const getRating = await Feedback.aggregate([
+        {
+          $match: { shopId: objectId(req.payload.aud) },
+        },
+        {
+          $group: { _id: "$shopId", avarge: { $avg: "$rateing" } },
+        },
+        {
+          $project: { _id: 0, avarge: 1 },
+        },
+      ]);
+      console.log(getRating, "objectId(req.payload.aud)");
+      console.log(rating);
+      res.status(200).json(getRating[0]).end();
+    } catch (error) {
+      console.log(error);
       next(error);
     }
   },

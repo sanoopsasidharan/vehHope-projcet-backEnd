@@ -10,10 +10,13 @@ const {
   find_topShop,
   ChangeBookingStatus,
   update_ShopProfile,
+  updatePassword,
   updateShop_pic,
+  gettingShopRating,
 } = require("../controller/ShopContoller");
 const { addServiceNote } = require("../controller/serviceController");
 const { findCurrentFrd } = require("../controller/conversationController");
+const { route } = require("express/lib/application");
 
 router.post("/isShopLoggedIn", verifyShopToken, (req, res, next) => {
   const payload = req.payload;
@@ -73,5 +76,12 @@ router.post("/addServiceNote", verifyShopToken, addServiceNote);
 // });
 
 router.get("/getCurrentFrd", findCurrentFrd);
+
+// @getShop rating
+// @nobody
+// retrun
+router.get("/getShop_Rating", verifyShopToken, gettingShopRating);
+
+router.post("/updatePassword", verifyShopToken, updatePassword);
 
 module.exports = router;
