@@ -2,10 +2,16 @@ const createError = require("http-errors");
 const User = require("../model/userModel");
 const Shop = require("../model/shopModel");
 const Booking = require("../model/Shop_BookingModel");
+const Feedback = require("../model/FeedbackModel");
 var objectId = require("mongodb").ObjectId;
 const { cloudinary } = require("../utils/cloudinary");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+
+const serviceID = process.env.serviceID;
+const accountSID = process.env.accountSID;
+const authToken = process.env.authToken;
+const client = require("twilio")(accountSID, authToken);
 
 const {
   loginSchema,
@@ -94,6 +100,7 @@ module.exports = {
       const saveUser = await user.save();
       res.json(saveUser);
     } catch (error) {
+      console.log(error);
       if (error.isJoi) return next(createError.BadRequest("data is not valid"));
       next(error);
     }
@@ -372,6 +379,99 @@ module.exports = {
       console.log(result);
       res.json({ message: "upload user pro pic" });
     } catch (error) {
+      next(error);
+    }
+  },
+  // user loggedOut
+  userLoggedOut: async (req, res, next) => {
+    try {
+      console.log("this is user logged out");
+      res
+        .cookie("userTocken", "", {
+          httpOnly: true,
+          expires: new Date(0),
+        })
+        .json({ logout: true });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  },
+  // otp login
+  otpLogin: async (req, res, next) => {
+    try {
+      console.log(req.body);
+      const result = await User.findOne({ number: req.body.number });
+      console.log(result);
+      if (!result)
+        return res.json({ message: "Number not valid", user: false });
+      if (!result.isActive)
+        return res.json({ message: "User is blocked ", user: false });
+
+      client.verify
+        .services(serviceID)
+        .verifications.create({ to: `+91${result.number}`, channel: "sms" })
+        .then((verification) => console.log(verification.status));
+
+      res.json({ message: " number is  valid", user: true });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  // conform otp
+  conformOtp: async (req, res, next) => {
+    try {
+      console.log("this is otp");
+      const { number, otp } = req.body;
+      client.verify
+        .services(serviceID)
+        .verificationChecks.create({ to: `+91${number}`, code: otp })
+        .then(async (verification_check) => {
+          if (verification_check.status === "approved") {
+            const user = await User.findOne({ number });
+            const accessToken = await signAccessToken(user);
+
+            res
+              .cookie("userTocken", accessToken, { httpOnly: true })
+              .json({ user, loggedIn: true, message: "user loggedin" });
+          } else {
+            res.json({ message: "otp not match", loggedIn: false });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          res.json(error);
+        });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  },
+
+  // finding Shop rateing
+  GettingShopRateing: async (req, res, next) => {
+    try {
+      console.log(req.body, "this is shop id ");
+      const { shopId } = req.body;
+      console.log(shopId, "this is shop Id req.body.shopId");
+
+      const rating = await Feedback.find({ shopId: objectId(shopId) });
+      const getRating = await Feedback.aggregate([
+        {
+          $match: { shopId: objectId(shopId) },
+        },
+        {
+          $group: { _id: "$shopId", avarge: { $avg: "$rateing" } },
+        },
+        {
+          $project: { _id: 0, avarge: 1 },
+        },
+      ]);
+      console.log(getRating, "objectId(req.payload.aud)");
+      console.log(rating);
+      res.status(200).json(getRating[0]).end();
+    } catch (error) {
+      console.log(error);
       next(error);
     }
   },

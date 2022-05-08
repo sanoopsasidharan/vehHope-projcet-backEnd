@@ -192,7 +192,7 @@ module.exports = {
           },
         },
         {
-          $match: { active: false },
+          $match: { active: true },
         },
       ]);
       console.log(topshops);
@@ -310,6 +310,21 @@ module.exports = {
       console.log(getRating, "objectId(req.payload.aud)");
       console.log(rating);
       res.status(200).json(getRating[0]).end();
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  },
+  // shop loggedout
+  shopLoggedout: async (req, res, next) => {
+    try {
+      console.log("this is shop loggout function");
+      res
+        .cookie("shopTocken", "", {
+          httpOnly: true,
+          expires: new Date(0),
+        })
+        .json({ loggedout: true });
     } catch (error) {
       console.log(error);
       next(error);

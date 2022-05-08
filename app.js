@@ -36,11 +36,11 @@ app.use(
   })
 );
 
-app.use("/", usersRouter);
-app.use("/admin", adminRouter);
-app.use("/shop", shopRouter);
-app.use("/conversation", conversationRouter);
-app.use("/message", messageRouter);
+app.use("/api/", usersRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/shop", shopRouter);
+app.use("/api/conversation", conversationRouter);
+app.use("/api/message", messageRouter);
 // app.use("/admin", adminRouter);
 
 // error handler

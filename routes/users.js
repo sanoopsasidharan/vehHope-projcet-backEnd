@@ -17,6 +17,10 @@ const {
   userHistory_InStatus,
   edit_userPassword,
   userPropic,
+  userLoggedOut,
+  otpLogin,
+  conformOtp,
+  GettingShopRateing,
 } = require("../controller/userController");
 const { userHomePage } = require("../controller/userHomeController");
 const { verifyAccessToken } = require("../config/jwt_helper");
@@ -118,5 +122,16 @@ router.post("/isLoggedin", verifyAccessToken, (req, res, next) => {
   let payload = req.payload;
   res.json({ user: true, payload });
 });
+
+// logout user
+// nobody
+// noreturn
+router.post("/userLogout", verifyAccessToken, userLoggedOut);
+
+router.post("/otpLogin", otpLogin);
+
+router.post("/conformOtp", conformOtp);
+
+router.post("/getingShop_rateing", verifyAccessToken, GettingShopRateing);
 
 module.exports = router;

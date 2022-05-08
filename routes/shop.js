@@ -13,6 +13,7 @@ const {
   updatePassword,
   updateShop_pic,
   gettingShopRating,
+  shopLoggedout,
 } = require("../controller/ShopContoller");
 const { addServiceNote } = require("../controller/serviceController");
 const { findCurrentFrd } = require("../controller/conversationController");
@@ -83,5 +84,10 @@ router.get("/getCurrentFrd", findCurrentFrd);
 router.get("/getShop_Rating", verifyShopToken, gettingShopRating);
 
 router.post("/updatePassword", verifyShopToken, updatePassword);
+
+// @shop logout
+// @nobody
+// return loggedout
+router.get("/shopLoggedOut", verifyShopToken, shopLoggedout);
 
 module.exports = router;

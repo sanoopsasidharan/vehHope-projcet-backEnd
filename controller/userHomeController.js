@@ -24,7 +24,9 @@ module.exports = {
   userHomePage: async (req, res, next) => {
     try {
       console.log("this is your home page ");
-      const shops = await Shop.find().sort({ _id: -1 }).limit(9);
+      const shops = await Shop.find({ active: true })
+        .sort({ _id: -1 })
+        .limit(9);
       console.log(shops);
       res.json(shops);
     } catch (error) {
