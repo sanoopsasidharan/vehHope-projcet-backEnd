@@ -75,6 +75,7 @@ module.exports = {
     });
   },
   verifyAccessToken: (req, res, next) => {
+    console.log(req.cookies.userTocken,'req.cookies.userTocken ....');
     console.log("calling is loggedin ");
     if (!req.cookies.userTocken) return res.json({ user: false });
     const userToken = req.cookies.userTocken;
