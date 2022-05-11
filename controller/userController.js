@@ -58,7 +58,7 @@ module.exports = {
       const accessToken = await signAccessToken(user);
 
       res
-        .cookie("userTocken", accessToken, { httpOnly: true })
+        // .cookie("userTocken", accessToken, { httpOnly: true })
         .json({ user, loggedIn: true });
     } catch (error) {
       if (error.isJoi)
