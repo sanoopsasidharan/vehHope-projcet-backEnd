@@ -59,7 +59,7 @@ module.exports = {
 
       res
         // .cookie("userTocken", accessToken, { httpOnly: true })
-        .json({ user, loggedIn: true });
+        .json({ user, loggedIn: true, token: accessToken });
     } catch (error) {
       if (error.isJoi)
         return next(createError.BadRequest("invalid username / password"));
